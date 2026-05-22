@@ -161,5 +161,14 @@ peak_edge_dist\
 fifty_pct_edge_dist\
 &ensp; Difference between edge and fifty_pct_edge
 
-- 
-
+- peak_edge_pop.csv
+Columns from L-R
+treatment\
+&ensp; C - control ie. -_Spirodela_\
+&ensp; S - spirodela ie. +_Spirodela_\
+Rep\
+&ensp; replicate number 1-25 for each treatment\
+peak\
+&ensp;Population size at the location (according to cm_plus column in densities) of the largest population density\
+edge\
+&ensp; Population size at the location of the furthest forward transect counted (according to cm_plus column in densities)
