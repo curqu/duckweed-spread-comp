@@ -142,7 +142,7 @@ cm_plus\
 fromLE\
 &ensp; The distance in cm of the given transect from the furthest forward transect counted along.
 ### Wave Steepness
- - peak_edge_dist.csv
+ - steepness_clean.csv
 
 Columns from L-R
 treatment\
