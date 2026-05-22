@@ -78,38 +78,38 @@ extent-over-time_clean.csv
 
 Columns L-R\
 Treatment\
-&ensp; C - control i.e. -_Spirodela_
-&ensp; S - Spirodela i.e. +_Spirodela_
+&ensp; C - control i.e. -_Spirodela_\
+&ensp; S - Spirodela i.e. +_Spirodela_\
 Rep\
 &ensp; replicate number 1-25 for each treatment\
 BenchID\
 &ensp; ID of the greenhouse bench replicate was positioned on, range is 1-5\
 day\
-&ensp; Day of experiment (0-30)
+&ensp; Day of experiment (0-30)\
 back\
-&ensp; Furthest back occupied cm of the gutter
+&ensp; Furthest back occupied cm of the gutter\
 front\
-&ensp; Furthest forward occupied cm of the gutter
+&ensp; Furthest forward occupied cm of the gutter\
 gap_back\
-&ensp; Furthest back cm of any large gap within the expansion extent; NA otherwise
+&ensp; Furthest back cm of any large gap within the expansion extent; NA otherwise\
 gap_front\
-&ensp; Furthest forward cm of any large gap within the expansion extent; NA otherwise
+&ensp; Furthest forward cm of any large gap within the expansion extent; NA otherwise\
 algae\
 &ensp; Level of algae present in the gutter, on a visual scale from 0 (none) to 3 (most water surface covered)\
 extent\
-&ensp; expansion extent i.e. difference between front and back.
+&ensp; expansion extent i.e. difference between front and back.\
 ### Genotype data
 genotypes_clean.csv
 
 Columns L-R\
 Treatment
-&ensp; CTRL - -_Spirodela_
-&ensp; SPIRO - +_Spirodela_
+&ensp; CTRL - -_Spirodela_\
+&ensp; SPIRO - +_Spirodela_\
 Rep\
 &ensp; replicate number 1-25 for each treatment\
 Position\
-&ensp; CORE - sample taken from population core
-&ensp; EDGE - sample taken from population edge
+&ensp; CORE - sample taken from population core\
+&ensp; EDGE - sample taken from population edge\
 Table\
 &ensp; Greenhouse bench where given replicate was located (1-5)\
 SampleID\
@@ -155,14 +155,15 @@ peak\
 fifty_pct_edge\
 &ensp;Location (according to cm_plus column in densities) of the furthest forward transect to reach at least 50% of the peak population density\
 edge\
-&ensp; Location of the furthest forward transect counted (according to cm_plus column in densities)
+&ensp; Location of the furthest forward transect counted (according to cm_plus column in densities)\
 peak_edge_dist\
 &ensp; Difference between edge and peak\ 
 fifty_pct_edge_dist\
 &ensp; Difference between edge and fifty_pct_edge
 
-- peak_edge_pop.csv
-Columns from L-R
+- peak_edge_pop.csv\
+  
+Columns from L-R\
 treatment\
 &ensp; C - control ie. -_Spirodela_\
 &ensp; S - spirodela ie. +_Spirodela_\
@@ -172,3 +173,34 @@ peak\
 &ensp;Population size at the location (according to cm_plus column in densities) of the largest population density\
 edge\
 &ensp; Population size at the location of the furthest forward transect counted (according to cm_plus column in densities)
+
+### Traits
+traits_clean.csv\
+
+columns L-R\
+genotypeID\
+&ensp; identifier for each unique genotype\
+root_mean\
+&ensp; mean of root length (mm) across measured individuals\
+root_sd\
+&ensp; standard deviation of root length\
+root_z\
+&ensp;z-score of root length compared to average across genotypes\
+SLA_mean\
+&ensp; mean of specific leaf area across measured individuals\
+SLA_sd\
+&ensp; standard deviation of specific leaf area\
+SLA_z\
+&ensp;z-score of specific leaf area compared to average across genotypes\
+rafts_mean\
+&ensp; mean of raft size (fronds per raft) across measured individuals\
+rafts_sd\
+&ensp; standard deviation of raft size\
+rafts_z\
+&ensp;z-score of raft size compared to average across genotypes\
+growth_mean\
+&ensp; mean number of fronds produced in 7 days by a single frond across measured individuals (i.e. low density population growth rate)\
+growth_sd\
+&ensp; standard deviation of low density population growth rate\
+growth_z\
+&ensp;z-score of low density population growth rate compared to average across genotypes\
