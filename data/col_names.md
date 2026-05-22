@@ -133,3 +133,33 @@ cm\
 &ensp; centimeter of the gutter corresponding to the transect counted along\
 gutter_width\
 &ensp; width of the gutter at the water surface along the transect
+frond_no\
+&ensp; Number of fronds counted along the transect\
+LE_cm\
+&ensp; cm corresponding to the furthest forward transect counted along\
+cm_plus\
+&ensp; corrected distances so that highest cm value always corresponds to the leading edge, removes negative cm induced in expansions that spread from the far end of their gutter\
+fromLE\
+&ensp; The distance in cm of the given transect from the furthest forward transect counted along.
+### Wave Steepness
+ - peak_edge_dist.csv
+
+Columns from L-R
+treatment\
+&ensp; C - control ie. -_Spirodela_\
+&ensp; S - spirodela ie. +_Spirodela_\
+Rep\
+&ensp; replicate number 1-25 for each treatment\
+peak\
+&ensp;Location (according to cm_plus column in densities) of the largest population density\
+fifty_pct_edge\
+&ensp;Location (according to cm_plus column in densities) of the furthest forward transect to reach at least 50% of the peak population density\
+edge\
+&ensp; Location of the furthest forward transect counted (according to cm_plus column in densities)
+peak_edge_dist\
+&ensp; Difference between edge and peak\ 
+fifty_pct_edge_dist\
+&ensp; Difference between edge and fifty_pct_edge
+
+- 
+
