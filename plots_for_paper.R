@@ -1,13 +1,13 @@
 ##############################################################################
 #
-#  PLOTS  --  Use clean data (see data_cleanup for orignal files + processing)
+#  PLOTS & ACCOMANYING STATS
 #  24 April 2025
 #
 ##############################################################################
 
 # Set up workspace
 
-setwd("~/Documents/PhD/THESIS/DUCKWEED")
+setwd("")
 library(dplyr)
 library(tidyr,purrr)
 
@@ -16,15 +16,15 @@ library(tidyr,purrr)
 
 # bring in data
 
-data_ext<-read.csv("./extent-over-time_clean.csv")
-densities<-read.csv("./density_data_clean.csv")
-peak_edge_dist<-read.csv("./steepness_clean.csv")
-peak_edge_pop<-read.csv("./peak_edge_pop_clean.csv")
-genotypes<-read.csv("./genotypes_clean.csv")
-summary_byrep<-read.csv("./data_summary_clean.csv")
-summary_edges<-read.csv("./data_summaryedges_clean.csv")
-summary_cores<-read.csv("./data_summarycores_clean.csv")
-traits<-read.csv("traits.csv")
+data_ext<-read.csv("./data/extent-over-time_clean.csv")
+densities<-read.csv("./data/density_data_clean.csv")
+peak_edge_dist<-read.csv("./data/steepness_clean.csv")
+peak_edge_pop<-read.csv("./data/peak_edge_pop_clean.csv")
+genotypes<-read.csv("./data/genotypes_clean.csv")
+summary_byrep<-read.csv("./data/data_summary_clean.csv")
+summary_edges<-read.csv("./data/data_summaryedges_clean.csv")
+summary_cores<-read.csv("./data/data_summarycores_clean.csv")
+traits<-read.csv("data/traits.csv")
 
 ###############################################################################
 
@@ -144,6 +144,7 @@ endextent_nO<-endextent %>%
   filter(!(Rep == 20 & endextent$Treatment == "S"))
 
 #draw plot
+png("fig1_extent.png",width=350,height=300)
 par(fig=c(0.01,0.8,0,1))
 plot(NULL,ylim=c(5,273),xlim=c(1,29),cex.axis=1.5,ylab="Extent (cm)",xlab="Day",cex.lab=1.5)
 for (i in 1:length(extC_byrep)){
@@ -154,10 +155,8 @@ for (i in 1:length(extS_byrep)){
   data<-extS_byrep[[i]]
   lines(x=data$day,y=data$extent,col=spirocol,lwd=2.5)
 }
-#abline(a=coef(lm_ext_C[1]),coef(lm_ext_C[2]),col=cmeancol,lwd=6)
-#abline(a=coef(lm_ext_S[1]),b=coef(lm_ext_S[2]),col=smeancol,lwd=6)
 
-#forced ones
+#force through 8cm at day 0
 abline(a=8,b=coef(lm_ext_C),col=cmeancol,lwd=6)
 abline(a=8,b=coef(lm_ext_S),col=smeancol,lwd=6)
 
@@ -171,6 +170,7 @@ par(fig=c(0.75,0.95,0,1),new=TRUE)
 boxplot(endextent$extent[endextent$Treatment=="S"],
         axes=FALSE,
         col=spirocol,ylim=c(5,273),lwd=2)
+dev.off()
 
 #stats
 sd.ctrl<-sd(endextent$extent[endextent$Treatment=="C"])
@@ -182,8 +182,6 @@ cv.spiro<-sd(endextent$extent[endextent$Treatment=="S"])/
   mean(endextent$extent[endextent$Treatment=="S"])
 
 lnVR_ext<-log(sd.spiro/sd.ctrl)+1/(2*length(endextent$extent[endextent$Treatment=="S"])-1)-1/(2*length(endextent$extent[endextent$Treatment=="C"])-1)
-
-
 lnCVR_ext<-log(cv.spiro/cv.ctrl)+1/(2*length(endextent$extent[endextent$Treatment=="S"])-1)-1/(2*length(endextent$extent[endextent$Treatment=="C"])-1)
 
 # without outlier
@@ -196,7 +194,6 @@ cv.spiro<-sd(endextent_nO$extent[endextent_nO$Treatment=="S"])/
   mean(endextent_nO$extent[endextent_nO$Treatment=="S"])
 
 lnVR_extNO<-log(sd.spiro/sd.ctrl)+1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="S"])-1)-1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="C"])-1)
-
 lnCVR_extNO<-log(cv.spiro/cv.ctrl)+1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="S"])-1)-1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="C"])-1)
 
 
@@ -253,6 +250,7 @@ densS_byrep<-list(
 
 
 # density reps + steepness
+png("fig2_densities.png",width=350,height=200)
 layout(matrix(c(1,2,3,3,4,4),2,3),widths =c(5,2,2))
 par(mar=c(2.6, 4.1, 4.1, 2.1))
 plot(NULL, xlim = c(3, 200), ylim = c(0, 80), 
@@ -265,9 +263,6 @@ for (i in 1:length(densC_byrep)){
   lines(x=data$cm_plus,y=data$frond_no,col=cols16trans[i],lwd=2,type="b")
 }
 par(mar=c(5.1, 4.1, 1.6, 2.1))
-# boxplot(peak_edge_pop$peak[peak_edge_pop$treatment=="S"],
-#         peak_edge_pop$edge[peak_edge_pop$treatment=="S"],at=c(1.2,74),xlim=c(0,75),
-#         boxwex=3.4,xlab="",ylab="", xaxt="n",ylim=c(0,80),col=smeancol)
 plot(NULL, xlim = c(3, 70), ylim = c(0, 80), 
      xlab = "", ylab = "", type = "n",xaxt="n",cex.axis=1.5) 
 for (i in 1:length(densS_byrep)){
@@ -295,6 +290,7 @@ boxplot(1/peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"],
         col=c(cmeancol,smeancol),xaxt="n",boxwex=0.8,cex.axis=1.5)
 mtext("Wave steepness",side=2,line=2.5,cex=1.5)
 mtext("d)",side=3,line=0.5,at=0.25,cex=1.5)
+dev.off()
 
 #stats
 sd.cntrl<-sd(1/peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"])
@@ -306,31 +302,20 @@ cv.spiro<-sd(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])/
   mean(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])
 
 lnVR_steep<-log(sd.spiro/sd.cntrl)+1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])-1)-1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"])-1)
-
-
-
 lnCVR_steep<-log(cv.spiro/cv.ctrl)+
   1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])-1)-1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"])-1)
 
-
 cv.peak<-sd(peak_edge_dist$peak[peak_edge_dist$treatment=="C"])/
   mean(peak_edge_dist$peak[peak_edge_dist$treatment=="C"])
-
 cv.edgeC<-sd(peak_edge_dist$edge[peak_edge_dist$treatment=="C"])/
   mean(peak_edge_dist$edge[peak_edge_dist$treatment=="C"])
 
 lnVR_steep<-log(sd.spiro/sd.cntrl)+1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])-1)-1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"])-1)
-
-
-
 lnCVR_steep<-log(cv.spiro/cv.ctrl)+
   1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="S"])-1)-1/(2*length(peak_edge_dist$fifty_pct_edge_dist[peak_edge_dist$treatment=="C"])-1)
 
-
-
 cv.peak<-sd(peak_edge_dist$peak[peak_edge_dist$treatment=="S"])/
   mean(peak_edge_dist$peak[peak_edge_dist$treatment=="S"])
-
 cv.edgeS<-sd(peak_edge_dist$edge[peak_edge_dist$treatment=="S"])/
   mean(peak_edge_dist$edge[peak_edge_dist$treatment=="S"])
 
@@ -362,8 +347,7 @@ summ_ctrl_core<-subset(summary_cores, summary_edges$Treatment == "C")
 summ_spiro_edge<-subset(summary_edges, summary_edges$Treatment == "S")
 summ_spiro_core<-subset(summary_cores, summary_edges$Treatment == "S")
 
-# bootstrapped SL
-
+# bootstrapped Significance levels
 freqsigsCE<-summary_byrep %>%
   filter(Treatment=="C" & position=="EDGE") %>%
   select(Treatment,Rep,position,final_ext,prop_LJ01,prop_LJ02, prop_LJ03,prop_LJ04,
@@ -373,7 +357,6 @@ freqsigsCE<-summary_byrep %>%
   pivot_longer(cols=prop_LJ01:sig_LM06,
                names_to = c(".value","genotype"),
                names_sep = "_")
-
 
 freqsigsSE<-summary_byrep %>%
   filter(Treatment=="S" & position=="EDGE") %>%
@@ -407,7 +390,6 @@ traitsigsCE<-summary_traitfreq %>%
                names_to = c("trait",".value"),
                names_sep = "\\.")
 
-
 traitsigsSE<-summary_traitfreq %>%
   filter(Treatment=="S" & position=="EDGE") %>%
   select(Treatment,Rep,position,final_ext,raft.z,SLA.z,root.z,growth.z,
@@ -416,17 +398,13 @@ traitsigsSE<-summary_traitfreq %>%
                names_to = c("trait",".value"),
                names_sep = "\\.")
 
-
 freqsigsCE$genotype<-as.factor(freqsigsCE$genotype)
 freqsigsSE$genotype<-as.factor(freqsigsSE$genotype)
 traitsigsCE$trait<-as.factor(traitsigsCE$trait)
 traitsigsSE$trait<-as.factor(traitsigsSE$trait)
 
 #grouped pies
-#png("fig3_pies_ctrl.png",width=750,height=850)
-#layout(matrix(c(1,1,2,2,3,3,4,4,5,5,5,5,5,6,6,6,7,7,7,7,7,8,8,8),8,3,byrow=FALSE))
 png("fig3_pies_ctrl-core.png",width=250,height=200) #stacked is 370 height
-#par(mfrow=c(2,1))
 par(mar=c(0,0,0,0))
 pie(table(c_core_gen$GenotypeID),col=colorvect,cex=1.2)
 dev.off()
@@ -437,7 +415,6 @@ pie(table(c_edge_gen$GenotypeID),col=colorvect,cex=1.2)
 dev.off()
 
 png("fig3_pies_spir-core.png",width=250,height=200)
-#par(mfrow=c(2,1))
 par(mar=c(0,0,0,0))
 pie(table(s_core_gen$GenotypeID),col=colorvect,cex=1.2)
 dev.off()
@@ -499,7 +476,6 @@ dev.off()
 
 
 # bootstrapped SL
-
 diffsigsCE<-summary_edges %>%
   filter(Treatment=="C") %>%
   select(Treatment,Rep,position,final_ext,LJ01_diff,LJ02_diff,LJ03_diff,LJ04_diff,
@@ -509,7 +485,6 @@ diffsigsCE<-summary_edges %>%
   pivot_longer(cols=LJ01_diff:LM06_sigdiff,
                names_to = c("genotype",".value"),
                names_sep = "_")
-
 
 diffsigsSE<-summary_edges %>%
   filter(Treatment=="S") %>%
@@ -558,10 +533,7 @@ traitsigdiffsCE$trait<-as.factor(traitsigdiffsCE$trait)
 traitsigdiffsSE$trait<-as.factor(traitsigdiffsSE$trait)
 
 
-#png("fig4_gendiff.png",width=700,height=900)
-#par(mfrow=c(1,2))
-#layout.matrix<-matrix(c(rep.int(1,16),rep.int(2,16),rep.int(0,8),rep.int(3,5),0,5,5,rep.int(3,5),0,5,5,
-                       # rep.int(4,5),0,5,5,rep.int(4,5),0,5,5),nrow=8,ncol=9,byrow=FALSE)
+png("fig4_gendiff.png",width=700,height=900)
 layout(matrix(c(1,1,1,2,2,2,0,0,0,3,0,5,4,0,5),nrow=3,ncol=5),widths=c(10,10,0.2,10,10),
        heights=c(9,0.7,4))
 par(mar=c(3.1,5.1,2.6,0))
@@ -582,12 +554,10 @@ stripchart(diffsigsSE$diff[diffsigsSE$sigdiff==TRUE]~diffsigsSE$genotype[diffsig
 stripchart(diffsigsSE$diff[diffsigsSE$sigdiff==FALSE]~diffsigsSE$genotype[diffsigsSE$sigdiff==FALSE],
            method="jitter",pch=10,col="darkgray",cex=2,add=TRUE,at=pos)
 abline(v=0,lty=2)
-#mtext("B.",side=3,line=0.5,at=-1,cex=1.5)
-#dev.off()
+dev.off()
 
 #traits
-#png("fig4_traitdiff.png",width=700,height=500)
-#par(mfrow=c(1,2))
+png("fig4_traitdiff.png",width=700,height=500)
 pos<-c(1:4)
 par(mar=c(3.1,3.1,2.6,1))
 stripchart(traitsigdiffsCE$diff[traitsigdiffsCE$sigdiff==FALSE]~traitsigdiffsCE$trait[traitsigdiffsCE$sigdiff==FALSE],
@@ -606,17 +576,14 @@ stripchart(traitsigdiffsSE$diff[traitsigdiffsSE$sigdiff==FALSE]~traitsigdiffsSE$
 stripchart(traitsigdiffsSE$diff[traitsigdiffsSE$sigdiff==TRUE]~traitsigdiffsSE$trait[traitsigdiffsSE$sigdiff==TRUE],
            method="jitter",pch=16,col=smeancol,add=TRUE,cex=2.5,at=pos)
 abline(v=0,lty=2)
-#mtext("d)",side=3,line=0.5,at=-2.5,cex=1.5)
-#dev.off()
+dev.off()
 
-#png("fig4_divloss.png",width=700,height=200)
+png("fig4_divloss.png",width=700,height=200)
 par(mar=c(3.1,0,0.1,3.6))
 boxplot(summary_edges$div_diff[summary_edges$Treatment=="C"],summary_edges$div_diff[summary_edges$Treatment=="S"],
         horizontal = TRUE,col=c(cmeancol,smeancol),yaxt="n",cex.axis=1.8,outcex=2)
 mtext("C. Genotype diversity",side=3,line=0.5,at=0,cex=1.5)
-#dev.off()
-
-#PCA
+dev.off()
 
 ##########################################################################
 
@@ -630,10 +597,7 @@ summary_edges$steepness<-peak_edge_distance$steepness_50
 # population density (5 cm behind the edge)
 summary_edges$pop_size<-peak_edge_pop$edge
 
-
 # 4 by 2 panels -- trait dist by genotype + extent by trait
-
-
 LM.roots<-lm(summary_edges$final_ext~
                summary_edges$Treatment*summary_edges$root.z)
 LM.roots<-lm(summary_edges$final_ext~
@@ -645,7 +609,7 @@ LM.SLA<-lm(summary_edges$final_ext~
 LM.growth<-lm(summary_edges$final_ext~
              summary_edges$Treatment*summary_edges$growth.z)
 
-#layout(matrix(c(1,2,3,4,5,6,7,8),nrow=2,ncol=4),heights = c(2,1.5),widths=c(2,2,2,2))
+png("fig5_traits-speed.png",width=550,height=200)
 par(mfrow=c(1,4))
 par(mar=c(2.1,2.1,1.1,1.1)) 
 plot(summary_edges$final_ext[summary_edges$Treatment == "C"]~
@@ -700,3 +664,4 @@ lines(range(summary_edges$growth.z),coef(LM.growth)[1]+coef(LM.growth)[3]*range(
 lines(range(summary_edges$growth.z),coef(LM.growth)[1]+coef(LM.growth)[2]
       +(coef(LM.growth)[3]+coef(LM.growth)[4])*range(summary_edges$growth.z),
       col="darkgrey",lwd=2,lty=2)
+dev.off()
