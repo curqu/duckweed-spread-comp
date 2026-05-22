@@ -32,16 +32,10 @@ root.z\
 &ensp; z score of genotype-weighted root length\
 growth.z\
 &ensp; z score of genotype-weighted low density growth rate\
-LJ01_change -- LM06_change\
-&ensp; these columns give the difference in frequency between day 30 and day 1\
 GenNo\
 &ensp; The number of distinct genotypes present in the sample\
-Simpson\
-&ensp; Simpson's diversity index\
 InvSimpson\
 &ensp; The inverse of the Simpson's diversity index\
-Abundance\
-&ensp; ???\
 CI_freq\
 &ensp; Upper bound of 95% confidence interval from simulated samples of size n with equal genotype frequencies\
 CIup_diff / CIlow_diff\
@@ -63,4 +57,79 @@ CIdiff_SLAUP / CIdiff_SLALOW\
 CIdiff_rootUP / CIdiff_rootLOW\
 &ensp; upper and lower bounds of 95% confidence intervals of differences in root length from simulated pairwise samples of size n with equal genotype frequencies\
 CIdiff_growthUP / CIdiff_growthLOW\
-&ensp; upper and lower bounds of 95% confidence intervals of differences in low density population growth rate from simulated pairwise samples of size n with equal genotype frequencies\
+&ensp; upper and lower bounds of 95% confidence intervals of differences in low density population growth rate from simulated pairwise samples of size n with equal genotype frequencies
+#### Columns only in data_summaryedges
+LJ01_diff -- LM06_diff\
+&ensp; these columns give the difference in frequency between edge and core samples in a given replicate\
+LJ01_sigdiff -- LM06_sigdiff\
+&ensp; A binary variable for whether the difference between edge and core genotype frequency sample falls outside the 95% confidence estimate for pairwise comparisons with equal genotype frequencies\
+SLA_diff\
+&ensp; The difference in specific leaf area z-score between edge and core samples for the given replicate.\
+root_diff\
+&ensp; The difference in root length z-score between edge and core samples for the given replicate.\
+raft_diff\
+&ensp; The difference in raft size z-score between edge and core samples for the given replicate.\
+growth_diff\
+&ensp; The difference in low density population growth rate z-score between edge and core samples for the given replicate.\
+div_diff\
+&ensp; The difference in Inverse Simpson's  between edge and core samples for the given replicate.
+### Extent
+extent-over-time_clean.csv
+
+Columns L-R\
+Treatment\
+&ensp; C - control i.e. -_Spirodela_
+&ensp; S - Spirodela i.e. +_Spirodela_
+Rep\
+&ensp; replicate number 1-25 for each treatment\
+BenchID\
+&ensp; ID of the greenhouse bench replicate was positioned on, range is 1-5\
+day\
+&ensp; Day of experiment (0-30)
+back\
+&ensp; Furthest back occupied cm of the gutter
+front\
+&ensp; Furthest forward occupied cm of the gutter
+gap_back\
+&ensp; Furthest back cm of any large gap within the expansion extent; NA otherwise
+gap_front\
+&ensp; Furthest forward cm of any large gap within the expansion extent; NA otherwise
+algae\
+&ensp; Level of algae present in the gutter, on a visual scale from 0 (none) to 3 (most water surface covered)\
+extent\
+&ensp; expansion extent i.e. difference between front and back.
+### Genotype data
+genotypes_clean.csv
+
+Columns L-R\
+Treatment
+&ensp; CTRL - -_Spirodela_
+&ensp; SPIRO - +_Spirodela_
+Rep\
+&ensp; replicate number 1-25 for each treatment\
+Position\
+&ensp; CORE - sample taken from population core
+&ensp; EDGE - sample taken from population edge
+Table\
+&ensp; Greenhouse bench where given replicate was located (1-5)\
+SampleID\
+&ensp;Unique ID given to DNA sample\
+GenotypeID\
+&ensp; Genotype determined from microsatellite analysis
+### Density data
+density_data_clean.csv
+
+Columns L-R\
+cam\
+&ensp; camera image was taken with\
+img_id\
+&ensp; file name of corresponding image\
+treatment\
+&ensp; C - control ie. -_Spirodela_\
+&ensp; S - spirodela ie. +_Spirodela_\
+Rep\
+&ensp; replicate number 1-25 for each treatment\
+cm\
+&ensp; centimeter of the gutter corresponding to the transect counted along\
+gutter_width\
+&ensp; width of the gutter at the water surface along the transect
