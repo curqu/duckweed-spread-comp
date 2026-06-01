@@ -8,19 +8,20 @@ Public Domain Dedication
 
 ## 2. Data derived from other sources
 
-NA
+N/A
 
 ## 3. Recommended citation for this data/code archive
 
-
+[removed for peer review]
 
 # DATA & CODE FILE OVERVIEW
 
-This data repository consist of 9 data files, 2 code scripts, and this README document, with the following data and code filenames and variables
+This data repository consist of 15 data files, 2 code scripts, and this README document, with the following data and code filenames and variables.
 
 ## Data files and variables
 
-See col_names.md in data folder
+For all .csv data files: See col_names.md in data folder
+For example image analysis: See photo_info.md in img_analysis_eg folder
 
 ## Code scripts and workflow
 
@@ -37,3 +38,5 @@ All analyses were conducted in R v. 4.5.1. Required packages are:
 4. tidyR 1.3.1
 5. vegan 2.7-1
 6. boot 1.3-32
+
+Image analysis conducted with ImageJ version 1.54j.
