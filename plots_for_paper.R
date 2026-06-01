@@ -197,6 +197,44 @@ lnVR_extNO<-log(sd.spiro/sd.ctrl)+1/(2*length(endextent_nO$extent[endextent_nO$T
 lnCVR_extNO<-log(cv.spiro/cv.ctrl)+1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="S"])-1)-1/(2*length(endextent_nO$extent[endextent_nO$Treatment=="C"])-1)
 
 
+# bootstrapped CI
+lnVR_function <- function(data,indices) {
+  d<-data[indices,]
+  e <- subset(d,d$Treatment== "S")#experimental
+  e <- e$extent
+  c <- subset(d,d$Treatment== "C") # ctrl
+  c <- c$extent
+  sd_e <- sd(e, na.rm = TRUE)
+  sd_c <- sd(c, na.rm = TRUE)
+  return(log(sd_e/sd_c)+1/(2*length(e)-1)-1/(2*length(c)-1))
+}
+
+lnCVR_function <- function(data,indices) {
+  d<-data[indices,]
+  e <- subset(d,d$Treatment== "S")#experimental
+  e <- e$extent
+  c <- subset(d,d$Treatment== "C") # ctrl
+  c <- c$extent
+  mean_e <- mean(e, na.rm = TRUE)
+  mean_c <- mean(c, na.rm = TRUE)
+  sd_e <- sd(e, na.rm = TRUE)
+  sd_c <- sd(c, na.rm = TRUE)
+  CV_e<-(sd_e / mean_e)
+  CV_c<-(sd_c / mean_c) # the CV
+  return(log(CV_e/CV_c)+1/(2*length(e)-1)-1/(2*length(c)-1))
+}
+
+boot_results <- boot(data = endextent, statistic = lnCVR_function, R = 2000)
+CVR_ext_ci95<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = endextent, statistic = lnVR_function, R = 2000)
+VR_ext_ci95<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(data = endextent_nO, statistic = lnCVR_function, R = 2000)
+CVRno_ext_ci95<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = endextent_nO, statistic = lnVR_function, R = 2000)
+VRno_ext_ci95<-boot.ci(boot_results, type = "bca")
+
+
 #diff in extent
 summary(aov(data_ext$extent[data_ext$day==6]~data_ext$Treatment[data_ext$day==6]))#***
 summary(aov(data_ext$extent[data_ext$day==30]~data_ext$Treatment[data_ext$day==30])) 
@@ -206,6 +244,16 @@ summary(aov(data_ext$extent[data_ext$day==30]~data_ext$Treatment[data_ext$day==3
 # LE Density (Fig 2)
 
 #########################################################################
+
+# calculate steepness
+peak_edge_distance <- densities %>% 
+  group_by(treatment,Rep) %>% 
+  summarise(peak = cm_plus[max(which(frond_no==max(frond_no,na.rm=T)))],
+            fifty_pct_edge = cm_plus[max(which(frond_no>quantile(frond_no[frond_no>=1],probs = 0.5,na.rm=T)))],
+            edge = cm_plus[max(which(frond_no>=1))],
+            peak_edge_dist = edge - peak,
+            fifty_pct_edge_dist = edge - fifty_pct_edge
+            )
 
 densC_byrep<- list(
   subset(densities, treatment =="C" & Rep ==1),
@@ -247,7 +295,6 @@ densS_byrep<-list(
   subset(densities, treatment =="S" & Rep ==24),
   subset(densities, treatment =="S" & Rep ==25)
 )
-
 
 # density reps + steepness
 png("fig2_densities.png",width=350,height=200)
@@ -322,6 +369,40 @@ cv.edgeS<-sd(peak_edge_dist$edge[peak_edge_dist$treatment=="S"])/
 lnCVR_peS<-log(cv.peak/cv.edge) 
 lnCVR_edges<-log(cv.edgeS/cv.edgeC)
 
+
+# bootstrapped CI
+lnVR_function <- function(data,indices) {
+  d<-data[indices,]
+  e <- subset(d,d$treatment== "S")#experimental
+  e <- e$fifty_pct_edge_dist
+  c <- subset(d,d$treatment== "C") # ctrl
+  c <- c$fifty_pct_edge_dist
+  sd_e <- sd(e, na.rm = TRUE)
+  sd_c <- sd(c, na.rm = TRUE)
+  return(log(sd_e/sd_c)+1/(2*length(e)-1)-1/(2*length(c)-1))
+}
+
+lnCVR_function <- function(data,indices) {
+  d<-data[indices,]
+  e <- subset(d,d$treatment== "S")#experimental
+  e <- e$fifty_pct_edge_dist
+  c <- subset(d,d$treatment== "C") # ctrl
+  c <- c$fifty_pct_edge_dist
+  mean_e <- mean(e, na.rm = TRUE)
+  mean_c <- mean(c, na.rm = TRUE)
+  sd_e <- sd(e, na.rm = TRUE)
+  sd_c <- sd(c, na.rm = TRUE)
+  CV_e<-(sd_e / mean_e)
+  CV_c<-(sd_c / mean_c) # the CV
+  return(log(CV_e/CV_c)+1/(2*length(e)-1)-1/(2*length(c)-1))
+}
+
+boot_results <- boot(data = peak_edge_dist, statistic = lnCVR_function, R = 2000)
+CVR_st_ci95<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = peak_edge_dist, statistic = lnVR_function, R = 2000)
+VR_st_ci95<-boot.ci(boot_results, type = "bca")
+
+
 summary(aov(peak_edge_dist$fifty_pct_edge_dist~peak_edge_dist$treatment)) #***
 
 ##############################################################################################
@@ -346,6 +427,24 @@ summ_ctrl_edge<-subset(summary_edges, summary_edges$Treatment == "C")
 summ_ctrl_core<-subset(summary_cores, summary_edges$Treatment == "C")
 summ_spiro_edge<-subset(summary_edges, summary_edges$Treatment == "S")
 summ_spiro_core<-subset(summary_cores, summary_edges$Treatment == "S")
+
+#diversity
+summary_byrep_div<-subset(summary_byrep,summary_byrep$n>9) %>%
+  select(Treatment,Rep,position,final_ext,n,prop_LJ01,prop_LJ02,
+         prop_LJ03,prop_LJ04,prop_LM01,prop_LM02,prop_LM03,prop_LM04,prop_LM05,prop_LM06) %>%
+  gather(key=genotype,value=proportion,prop_LJ01:prop_LM06,
+         factor_key = TRUE)%>%
+  group_by(Treatment,Rep,position) %>%
+  group_by(genotype)  %>%
+  mutate(count = round(proportion*n))
+
+diversity<-summary_byrep_div %>%
+  group_by(Treatment,Rep,position) %>%
+  summarise(GenNo=specnumber(count),
+            InvSimpson=diversity(count,index="invsimpson"))
+
+summary_byrep<- summary_byrep %>%
+  left_join(diversity,by=c("Treatment","Rep","position"))
 
 # bootstrapped Significance levels
 freqsigsCE<-summary_byrep %>%
@@ -474,7 +573,6 @@ dev.off()
 
 #####################################################################################################
 
-
 # bootstrapped SL
 diffsigsCE<-summary_edges %>%
   filter(Treatment=="C") %>%
@@ -532,6 +630,80 @@ diffsigsSE$genotype<-as.factor(diffsigsSE$genotype)
 traitsigdiffsCE$trait<-as.factor(traitsigdiffsCE$trait)
 traitsigdiffsSE$trait<-as.factor(traitsigdiffsSE$trait)
 
+#bootstrapping on mean freqs
+
+mean_function<-function(data,indices){
+  x<-data[indices]
+  return(mean(x,na.rm=TRUE))
+}
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LJ01"], statistic = mean_function, R = 2000)
+diffLJ01C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LJ02"], statistic = mean_function, R = 2000)
+diffLJ02C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LJ03"], statistic = mean_function, R = 2000)
+diffLJ03C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LJ04"], statistic = mean_function, R = 2000)
+diffLJ04C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM01"], statistic = mean_function, R = 2000)
+diffLM01C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM02"], statistic = mean_function, R = 2000)
+diffLM02C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM03"], statistic = mean_function, R = 2000)
+diffLM03C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM04"], statistic = mean_function, R = 2000)
+diffLM04C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM05"], statistic = mean_function, R = 2000)
+diffLM05C.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsCE$diff[diffsigsCE$genotype=="LM06"], statistic = mean_function, R = 2000)
+diffLM06C.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LJ01"], statistic = mean_function, R = 2000)
+diffLJ01.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LJ02"], statistic = mean_function, R = 2000)
+diffLJ02.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LJ03"], statistic = mean_function, R = 2000)
+diffLJ03.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LJ04"], statistic = mean_function, R = 2000)
+diffLJ04.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM01"], statistic = mean_function, R = 2000)
+diffLM01.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM02"], statistic = mean_function, R = 2000)
+diffLM02.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM03"], statistic = mean_function, R = 2000)
+diffLM03.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM04"], statistic = mean_function, R = 2000)
+diffLM04.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM05"], statistic = mean_function, R = 2000)
+diffLM05.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = diffsigsSE$diff[diffsigsSE$genotype=="LM06"], statistic = mean_function, R = 2000)
+diffLM06.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(data = traitsigdiffsCE$diff[traitsigdiffsCE$trait=="root"], statistic = mean_function, R = 2000)
+diffrootCE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsCE$diff[traitsigdiffsCE$trait=="SLA"], statistic = mean_function, R = 2000)
+diffSLACE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsCE$diff[traitsigdiffsCE$trait=="raft"], statistic = mean_function, R = 2000)
+diffraftCE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsCE$diff[traitsigdiffsCE$trait=="growth"], statistic = mean_function, R = 2000)
+diffgrowthCE.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(data = traitsigdiffsSE$diff[traitsigdiffsSE$trait=="root"], statistic = mean_function, R = 2000)
+diffrootSE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsSE$diff[traitsigdiffsSE$trait=="SLA"], statistic = mean_function, R = 2000)
+diffSLASE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsSE$diff[traitsigdiffsSE$trait=="raft"], statistic = mean_function, R = 2000)
+diffraftSE.CI<-boot.ci(boot_results, type = "bca")
+boot_results <- boot(data = traitsigdiffsSE$diff[traitsigdiffsSE$trait=="growth"], statistic = mean_function, R = 2000)
+diffgrowthSE.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(summary_edges$InvSimpson[summary_edges$Treatment=="C"], statistic = mean_function, R = 2000)
+diffdiv.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(summary_edges$InvSimpson[summary_edges$Treatment=="S"], statistic = mean_function, R = 2000)
+diffdivS.CI<-boot.ci(boot_results, type = "bca")
+
+boot_results <- boot(summary_edges$InvSimpson, statistic = mean_function, R = 2000)
+diffdiv.CI<-boot.ci(boot_results, type = "bca")
 
 png("fig4_gendiff.png",width=700,height=900)
 layout(matrix(c(1,1,1,2,2,2,0,0,0,3,0,5,4,0,5),nrow=3,ncol=5),widths=c(10,10,0.2,10,10),
@@ -584,6 +756,10 @@ boxplot(summary_edges$div_diff[summary_edges$Treatment=="C"],summary_edges$div_d
         horizontal = TRUE,col=c(cmeancol,smeancol),yaxt="n",cex.axis=1.8,outcex=2)
 mtext("C. Genotype diversity",side=3,line=0.5,at=0,cex=1.5)
 dev.off()
+
+#diversity stats
+summary(aov(summary_edges$InvSimpson~summary_edges$Treatment))
+summary(aov(summary_byrep$InvSimpson~summary_byrep$position*summary_byrep$Treatment))
 
 ##########################################################################
 
