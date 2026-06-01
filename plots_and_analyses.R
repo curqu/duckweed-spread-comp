@@ -10,7 +10,8 @@
 setwd("")
 library(dplyr)
 library(tidyr,purrr)
-
+library(boot)
+library(vegan)
 
 ###############################################################################
 
@@ -144,7 +145,7 @@ endextent_nO<-endextent %>%
   filter(!(Rep == 20 & endextent$Treatment == "S"))
 
 #draw plot
-png("fig1_extent.png",width=350,height=300)
+png("fig1_extent.png",width=850,height=600)
 par(fig=c(0.01,0.8,0,1))
 plot(NULL,ylim=c(5,273),xlim=c(1,29),cex.axis=1.5,ylab="Extent (cm)",xlab="Day",cex.lab=1.5)
 for (i in 1:length(extC_byrep)){
@@ -297,7 +298,7 @@ densS_byrep<-list(
 )
 
 # density reps + steepness
-png("fig2_densities.png",width=350,height=200)
+png("fig2_densities.png",width=950,height=400)
 layout(matrix(c(1,2,3,3,4,4),2,3),widths =c(5,2,2))
 par(mar=c(2.6, 4.1, 4.1, 2.1))
 plot(NULL, xlim = c(3, 200), ylim = c(0, 80), 
@@ -553,7 +554,7 @@ par(mfrow=c(1,2))
 par(mar=c(3.1,5.1,1.1,0))
 stripchart(traitsigsCE$z[traitsigsCE$sig==FALSE]~traitsigsCE$trait[traitsigsCE$sig==FALSE],
            method="jitter",pch=9,col="darkgray",xlim=c(-2,2),xlab="",cex=2,las=1,cex.axis=1.5,
-           group.names=rev(c("SLA","roots","raft sz","fec.")))
+           group.names=rev(c("SLA","roots","ramets","fec.")))
 stripchart(traitsigsCE$z[traitsigsCE$sig==TRUE]~traitsigsCE$trait[traitsigsCE$sig==TRUE],
            method="jitter",pch=18,col=cmeancol,add=TRUE,cex=3.5,at=pos)
 abline(v=0,lty=2)
@@ -705,7 +706,7 @@ diffdivS.CI<-boot.ci(boot_results, type = "bca")
 boot_results <- boot(summary_edges$InvSimpson, statistic = mean_function, R = 2000)
 diffdiv.CI<-boot.ci(boot_results, type = "bca")
 
-png("fig4_gendiff.png",width=700,height=900)
+png("fig4_diffs.png",width=900,height=800)
 layout(matrix(c(1,1,1,2,2,2,0,0,0,3,0,5,4,0,5),nrow=3,ncol=5),widths=c(10,10,0.2,10,10),
        heights=c(9,0.7,4))
 par(mar=c(3.1,5.1,2.6,0))
@@ -726,15 +727,15 @@ stripchart(diffsigsSE$diff[diffsigsSE$sigdiff==TRUE]~diffsigsSE$genotype[diffsig
 stripchart(diffsigsSE$diff[diffsigsSE$sigdiff==FALSE]~diffsigsSE$genotype[diffsigsSE$sigdiff==FALSE],
            method="jitter",pch=10,col="darkgray",cex=2,add=TRUE,at=pos)
 abline(v=0,lty=2)
-dev.off()
+
 
 #traits
-png("fig4_traitdiff.png",width=700,height=500)
+
 pos<-c(1:4)
 par(mar=c(3.1,3.1,2.6,1))
 stripchart(traitsigdiffsCE$diff[traitsigdiffsCE$sigdiff==FALSE]~traitsigdiffsCE$trait[traitsigdiffsCE$sigdiff==FALSE],
            method="jitter",pch=9,col="darkgray",xlim=c(-2.2,2.2),xlab="",cex=2.5,las=1,cex.axis=2,
-           group.names=rev(c("SLA","roots","raft sz","fec."))
+           group.names=rev(c("SLA","roots","ramets","fec."))
            )
 stripchart(traitsigdiffsCE$diff[traitsigdiffsCE$sigdiff==TRUE]~traitsigdiffsCE$trait[traitsigdiffsCE$sigdiff==TRUE],
            method="jitter",pch=18,col=cmeancol,add=TRUE,cex=3.5,at=pos)
@@ -748,9 +749,7 @@ stripchart(traitsigdiffsSE$diff[traitsigdiffsSE$sigdiff==FALSE]~traitsigdiffsSE$
 stripchart(traitsigdiffsSE$diff[traitsigdiffsSE$sigdiff==TRUE]~traitsigdiffsSE$trait[traitsigdiffsSE$sigdiff==TRUE],
            method="jitter",pch=16,col=smeancol,add=TRUE,cex=2.5,at=pos)
 abline(v=0,lty=2)
-dev.off()
 
-png("fig4_divloss.png",width=700,height=200)
 par(mar=c(3.1,0,0.1,3.6))
 boxplot(summary_edges$div_diff[summary_edges$Treatment=="C"],summary_edges$div_diff[summary_edges$Treatment=="S"],
         horizontal = TRUE,col=c(cmeancol,smeancol),yaxt="n",cex.axis=1.8,outcex=2)
@@ -768,7 +767,7 @@ summary(aov(summary_byrep$InvSimpson~summary_byrep$position*summary_byrep$Treatm
 ##########################################################################
 
 # steepness (50%)
-summary_edges$steepness<-peak_edge_distance$steepness_50
+summary_edges$steepness<-peak_edge_distance$fifty_pct_edge_dist
 
 # population density (5 cm behind the edge)
 summary_edges$pop_size<-peak_edge_pop$edge
@@ -785,8 +784,9 @@ LM.SLA<-lm(summary_edges$final_ext~
 LM.growth<-lm(summary_edges$final_ext~
              summary_edges$Treatment*summary_edges$growth.z)
 
-png("fig5_traits-speed.png",width=550,height=200)
+png("fig5_traits-speed.png",width=1000,height=280)
 par(mfrow=c(1,4))
+par(oma=c(1,1,1,1))
 par(mar=c(2.1,2.1,1.1,1.1)) 
 plot(summary_edges$final_ext[summary_edges$Treatment == "C"]~
        summary_edges$SLA.z[summary_edges$Treatment == "C"],col=ctrlcol,
@@ -841,3 +841,4 @@ lines(range(summary_edges$growth.z),coef(LM.growth)[1]+coef(LM.growth)[2]
       +(coef(LM.growth)[3]+coef(LM.growth)[4])*range(summary_edges$growth.z),
       col="darkgrey",lwd=2,lty=2)
 dev.off()
+
